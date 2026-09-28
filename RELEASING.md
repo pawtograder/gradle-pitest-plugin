@@ -93,7 +93,7 @@ Client projects pin the plugin in their `buildscript` block, so they have to bum
 buildscript {
     repositories { mavenCentral() }
     dependencies {
-        classpath 'com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.0'
+        classpath 'com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.1'
     }
 }
 apply plugin: 'com.pawtograder.info.solidsoft.pitest'
