@@ -12,7 +12,7 @@ buildscript {
 repositories {  //in root project for pitest-aggregator.jar
     mavenCentral()
 }
-apply plugin: "info.solidsoft.pitest.aggregator"
+apply plugin: "com.pawtograder.info.solidsoft.pitest.aggregator"
 
 subprojects {
     apply plugin: 'java'
@@ -31,7 +31,7 @@ subprojects {
 
 [":shared", ":for-report"].each { subprojectName ->
     configure(project(subprojectName)) {
-        apply plugin: "info.solidsoft.pitest"
+        apply plugin: "com.pawtograder.info.solidsoft.pitest"
 
         dependencies {
             implementation 'org.slf4j:slf4j-api:1.7.25'

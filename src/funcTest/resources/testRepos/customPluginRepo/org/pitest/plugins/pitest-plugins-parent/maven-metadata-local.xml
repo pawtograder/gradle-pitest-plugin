@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-  <groupId>org.pitest.plugins</groupId>
+  <groupId>com.pawtograder.org.pitest.plugins</groupId>
   <artifactId>pitest-plugins-parent</artifactId>
   <versioning>
     <release>0.0.2</release>

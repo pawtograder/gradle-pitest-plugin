@@ -9,3 +9,7 @@ classes/
 .poject
 .settings
 .classpath
+
+#Never commit the signing key
+secring.gpg
+*.gpg

@@ -25,7 +25,7 @@ import java.util.stream.Collectors
 @CompileStatic
 class PitestAggregatorPlugin implements Plugin<Project> {
 
-    public static final String PLUGIN_ID = "info.solidsoft.pitest.aggregator"
+    public static final String PLUGIN_ID = "com.pawtograder.info.solidsoft.pitest.aggregator"
     public static final String PITEST_REPORT_AGGREGATE_TASK_NAME = "pitestReportAggregate"
     //visibility for testing
     @PackageScope static final String PITEST_REPORT_AGGREGATE_CONFIGURATION_NAME = "pitestReport"
@@ -93,7 +93,7 @@ class PitestAggregatorPlugin implements Plugin<Project> {
                 .map { extension -> extension.pitestVersion.get() }
                 .orElse(PitestPlugin.DEFAULT_PITEST_VERSION)
 
-            dependencies.add(project.dependencies.create("org.pitest:pitest-aggregator:$pitestVersion"))
+            dependencies.add(project.dependencies.create("com.pawtograder.org.pitest:pitest-aggregator:$pitestVersion"))
         }
     }
 

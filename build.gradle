@@ -1,34 +1,31 @@
-apply plugin: 'groovy'
-apply plugin: 'java-gradle-plugin'
-apply plugin: 'codenarc'
-apply from: "$rootDir/gradle/cdeliveryboy-release.gradle"
-apply from: "$rootDir/gradle/report-version-consistency-check.gradle"
-apply plugin: "com.github.ben-manes.versions"
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 buildscript {
     repositories {
         mavenCentral()
-        mavenLocal()
         maven {
-            //for Plugin Publish plugin
             url 'https://plugins.gradle.org/m2/'
         }
     }
     dependencies {
-        classpath 'info.solidsoft.gradle:cdeliveryboy:0.8.0'
-        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0' //override version for more reliable releasing from Travis
-        classpath 'com.gradle.publish:plugin-publish-plugin:0.16.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.42.0'
     }
 }
 
-sourceCompatibility = 1.8
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'codenarc'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'com.github.ben-manes.versions'
 
-ext.pitestAggregatorVersion = "1.15.0"   //Must be equal to default PIT version in PitestPlugin
+//'group', 'version' and 'pitestVersion' live in gradle.properties - the only place where they have to be bumped
+
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    mavenLocal()
+    mavenLocal()    //to be able to test against a locally installed build of the pitest fork
 }
 
 sourceSets {
@@ -37,7 +34,7 @@ sourceSets {
 
 dependencies {
     implementation localGroovy()
-    compileOnly "org.pitest:pitest-aggregator:$pitestAggregatorVersion"
+    compileOnly "com.pawtograder.org.pitest:pitest-aggregator:$pitestVersion"
 
     testImplementation('org.spockframework:spock-core:2.3-groovy-2.5') {
         exclude group: 'org.codehaus.groovy'
@@ -57,6 +54,19 @@ dependencies {
     }
 }
 
+//The default PIT version is generated into the plugin jar from 'pitestVersion' in gradle.properties
+//and read back by PitestPlugin.DEFAULT_PITEST_VERSION - so the version is defined exactly once.
+ext.generatedResourcesDir = file("$buildDir/generated/resources/pitest-defaults")
+
+def generatePitestDefaultsProvider = tasks.register("generatePitestDefaults", WriteProperties) {
+    description = "Generates the properties file with the default PIT version used by the plugin."
+    outputFile = new File(generatedResourcesDir, "info/solidsoft/gradle/pitest/pitest-defaults.properties")
+    comment = "Generated from 'pitestVersion' in gradle.properties - do not edit"
+    property("defaultPitestVersion", project.pitestVersion)
+}
+
+sourceSets.main.output.dir(generatedResourcesDir, builtBy: generatePitestDefaultsProvider)
+
 task funcTest(type: Test) {
     description = 'Run the functional tests.'
     group = 'Verification'
@@ -67,7 +77,6 @@ task funcTest(type: Test) {
 funcTest.shouldRunAfter test
 check.shouldRunAfter funcTest
 check.dependsOn funcTestClasses     //or more generically: tasks.withType(AbstractCompile)
-uploadArchives.dependsOn funcTest, check
 
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
@@ -123,4 +132,128 @@ tasks.withType(CodeNarc) { codeNarcTask ->
             logger.warn("****************************** CODE NARC ******************************\n")
         }
     })
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Releasing - see RELEASING.md
+//
+// 'publish' stages signed artifacts into build/staging-deploy, 'centralBundle' zips them up in the layout expected
+// by the Maven Central Portal and 'publishToCentral' uploads that bundle. Nothing is published automatically.
+// ---------------------------------------------------------------------------------------------------------------
+
+ext.stagingRepoDir = file("$buildDir/staging-deploy")
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+//Groovy sources are not covered by 'javadoc', so put groovydoc into the javadoc jar to keep it useful
+tasks.named("javadocJar").configure {
+    from tasks.named("groovydoc")
+}
+
+publishing {
+    publications.withType(MavenPublication).configureEach {
+        pom {
+            name = 'Gradle PIT Plugin (Pawtograder fork)'
+            description = 'Gradle plugin for PIT mutation testing, using the Pawtograder fork of PIT'
+            url = 'https://github.com/pawtograder/gradle-pitest-plugin'
+            inceptionYear = '2012'
+
+            licenses {
+                license {
+                    name = 'The Apache Software License, Version 2.0'
+                    url = 'http://www.apache.org/licenses/LICENSE-2.0'
+                    distribution = 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id = 'szpak'
+                    name = 'Marcin Zajączkowski'
+                    email = 'mszpak ATT wp DOTT pl'
+                    roles = ['author of the original plugin']
+                }
+                developer {
+                    id = 'jon'
+                    name = 'Jonathan Bell'
+                    email = 'jon@pawtograder.com'
+                    roles = ['maintainer of the fork']
+                }
+            }
+
+            scm {
+                url = 'https://github.com/pawtograder/gradle-pitest-plugin'
+                connection = 'scm:git:git://github.com/pawtograder/gradle-pitest-plugin.git'
+                developerConnection = 'scm:git:git@github.com:pawtograder/gradle-pitest-plugin.git'
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'staging'    //a local staging repository - its content is uploaded to Maven Central as one bundle
+            url = uri(stagingRepoDir)
+        }
+    }
+}
+
+signing {
+    //Either an armored key in SIGNING_KEY/SIGNING_PASSWORD (e.g. gpg --armor --export-secret-keys <id>),
+    //or the standard signing.keyId/signing.password/signing.secretKeyRingFile Gradle properties
+    String signingKey = findProperty("signingKey") ?: System.getenv("SIGNING_KEY")
+    String signingPassword = findProperty("signingPassword") ?: System.getenv("SIGNING_PASSWORD")
+    if (signingKey) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+    //Signing is required for a release, but must not break 'publishToMavenLocal' on a machine without the key
+    required = { isSigningConfigured() }
+}
+
+//Eagerly, so that the signatures are added to the publication before the publishing tasks are wired
+publishing.publications.withType(MavenPublication).all { publication ->
+    signing.sign(publication)
+}
+
+boolean isSigningConfigured() {
+    return findProperty("signingKey") || System.getenv("SIGNING_KEY") || findProperty("signing.keyId")
+}
+
+def cleanStagingRepoProvider = tasks.register("cleanStagingRepo", Delete) {
+    description = "Removes previously staged artifacts, so that the uploaded bundle contains only the current version."
+    delete stagingRepoDir
+}
+
+tasks.withType(PublishToMavenRepository).configureEach { publishTask ->
+    if (publishTask.repository?.name == "staging") {
+        publishTask.dependsOn cleanStagingRepoProvider
+    }
+}
+
+def centralBundleProvider = tasks.register("centralBundle", Zip) {
+    description = "Packages the staged artifacts into a bundle accepted by the Maven Central Portal."
+    group = "publishing"
+    dependsOn tasks.named("check")   //a release must not be built from a red build
+    dependsOn tasks.named("publishAllPublicationsToStagingRepository")
+    from stagingRepoDir
+    exclude "**/maven-metadata*"     //not accepted (and not needed) in a Central Portal bundle
+    archiveFileName = "central-bundle-${project.version}.zip"
+    destinationDirectory = layout.buildDirectory
+    doFirst {
+        if (!isSigningConfigured()) {
+            throw new GradleException("No signing key configured - Maven Central rejects unsigned artifacts. See RELEASING.md")
+        }
+    }
+}
+
+tasks.register("publishToCentral", Exec) {
+    description = "Uploads the bundle to the Maven Central Portal (as a deployment awaiting your confirmation there)."
+    group = "publishing"
+    dependsOn centralBundleProvider
+    //Credentials come from ~/.gradle/gradle.properties (or the environment) - never from a file in this repo
+    environment "MAVEN_CENTRAL_USERNAME", findProperty("mavenCentralUsername") ?: System.getenv("MAVEN_CENTRAL_USERNAME") ?: ""
+    environment "MAVEN_CENTRAL_PASSWORD", findProperty("mavenCentralPassword") ?: System.getenv("MAVEN_CENTRAL_PASSWORD") ?: ""
+    commandLine "$rootDir/gradle/upload-to-central.sh", centralBundleProvider.get().archiveFile.get().asFile.absolutePath
 }

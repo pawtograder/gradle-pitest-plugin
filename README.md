@@ -3,35 +3,51 @@
 The plugin provides an ability to perform a [mutation testing](https://en.wikipedia.org/wiki/Mutation_testing) and
 calculate a mutation coverage of a [Gradle](https://gradle.org/)-based projects with [PIT](http://pitest.org/).
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.solidsoft.gradle.pitest/gradle-pitest-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/info.solidsoft.gradle.pitest/gradle-pitest-plugin)
-[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/info.solidsoft.pitest)](https://plugins.gradle.org/plugin/info.solidsoft.pitest)
-[![Build Status Travis](https://app.travis-ci.com/szpak/gradle-pitest-plugin.svg?branch=master)](https://app.travis-ci.com/szpak/gradle-pitest-plugin)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/szpak/gradle-pitest-plugin?branch=master&svg=true)](https://ci.appveyor.com/project/szpak/gradle-pitest-plugin/)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=szpak/gradle-pitest-plugin)](https://dependabot.com)
+> **This is the [Pawtograder](https://github.com/pawtograder) fork** of
+> [szpak/gradle-pitest-plugin](https://github.com/szpak/gradle-pitest-plugin). It is published under different
+> coordinates and it uses the Pawtograder fork of PIT (`com.pawtograder.org.pitest`) instead of upstream PIT.
+> Everything below applies, but the plugin id is `com.pawtograder.info.solidsoft.pitest` and the artifact is
+> `com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin`. See [RELEASING.md](RELEASING.md) for how a new
+> version is published.
 
 ## Quick start
 
-### The simplest way
-
-Add gradle-pitest-plugin to the `plugins` configuration in your `build.gradle` file:
+The fork is on Maven Central but not on the Gradle Plugin Portal, so add it through the `buildscript` block:
 
 ```groovy
-plugins {
-    id 'java' //or 'java-library' - depending on your needs
-    id 'info.solidsoft.pitest' version '1.15.0'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.0'
+    }
 }
+
+apply plugin: 'java' //or 'java-library' - depending on your needs
+apply plugin: 'com.pawtograder.info.solidsoft.pitest'
 ```
 
 <details>
 <summary>with Kotlin DSL</summary>
 
 ```kotlin
-plugins {
-    id("java") //or "java-library" - depending on your needs
-    id("info.solidsoft.pitest") version "1.15.0"
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.0")
+    }
 }
+
+apply(plugin = "java")
+apply(plugin = "com.pawtograder.info.solidsoft.pitest")
 ```
 </details>
+
+Plugin 1.0.0 defaults to PIT 2.0.0, a released version - a snapshot repository is no longer needed. To use a different
+PIT version, set `pitestVersion` in the `pitest` block; no new plugin release is required for that.
 
 Call Gradle with pitest task:
 

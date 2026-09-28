@@ -29,7 +29,7 @@ class PitestPluginTargetClassesTest extends Specification {
     void setup() {
         project = ProjectBuilder.builder().build()
         project.pluginManager.apply('java')
-        project.pluginManager.apply('info.solidsoft.pitest')
+        project.pluginManager.apply('com.pawtograder.info.solidsoft.pitest')
     }
 
     void "take target classes from pitest configuration closure"() {

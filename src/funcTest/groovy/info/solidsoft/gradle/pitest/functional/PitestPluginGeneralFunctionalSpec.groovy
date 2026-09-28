@@ -22,7 +22,7 @@ class PitestPluginGeneralFunctionalSpec extends AbstractPitestFunctionalSpec {
                     maven { url "./customPluginRepo/" }
                 }
                 dependencies {
-                    pitest 'org.pitest.plugins:pitest-plugin-configuration-reporter-plugin:0.0.2'
+                    pitest 'com.pawtograder.org.pitest.plugins:pitest-plugin-configuration-reporter-plugin:0.0.2'
                 }
                 pitest {
                     excludedClasses = []

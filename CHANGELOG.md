@@ -1,5 +1,21 @@
 # gradle-pitest-plugin changelog
 
+## Pawtograder fork
+
+### 1.0.0 - 2026-09-01
+
+ - PIT `2.0.0` (released, no longer a snapshot) by default - clients no longer need a snapshot repository
+ - The default PIT version is defined once, in `gradle.properties`, and generated into the plugin jar
+ - Releasing goes through the Maven Central Portal (`./gradlew publishToCentral`) - see [RELEASING.md](RELEASING.md);
+   the dead OSSRH/CDeliveryBoy/JReleaser configuration was removed
+ - Unit tests and test fixtures use the renamed plugin id `com.pawtograder.info.solidsoft.pitest` again
+
+### 0.1.0 - 2025-05-13
+
+ - First release of the fork: plugin id `com.pawtograder.info.solidsoft.pitest`, using the Pawtograder fork of PIT
+
+## Upstream (szpak/gradle-pitest-plugin)
+
 ## 1.15.0 - 2023-09-28
 
  - Automatically add `junit-platform-launcher` dependency to `testRuntimeOnly` for JUnit Platform projects - [#337](https://github.com/szpak/gradle-pitest-plugin/issues/337) - help from [Björn Kautler](https://github.com/Vampire)

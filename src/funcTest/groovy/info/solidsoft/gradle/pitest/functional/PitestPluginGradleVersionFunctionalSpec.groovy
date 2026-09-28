@@ -87,8 +87,8 @@ class PitestPluginGradleVersionFunctionalSpec extends AbstractPitestFunctionalSp
             verifyAll {
                 Throwable root = Exceptions.getRootCause(result.failure)
                 root.class.name == GradleException.name //name to mitigate differences on classloader
-                root.message.contains("'info.solidsoft.pitest' requires")
-                result.standardOutput.contains("WARNING. The 'info.solidsoft.pitest' plugin requires")
+                root.message.contains("'com.pawtograder.info.solidsoft.pitest' requires")
+                result.standardOutput.contains("WARNING. The 'com.pawtograder.info.solidsoft.pitest' plugin requires")
             }
     }
 

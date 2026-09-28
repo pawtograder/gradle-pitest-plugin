@@ -32,7 +32,7 @@ configure(project(":shared")) {
 }
 
 configure(project(':itest')) {
-    apply plugin: "info.solidsoft.pitest"
+    apply plugin: "com.pawtograder.info.solidsoft.pitest"
     dependencies {
         implementation project(':shared')
     }

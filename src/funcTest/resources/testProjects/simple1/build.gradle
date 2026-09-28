@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'info.solidsoft.pitest'
+apply plugin: 'com.pawtograder.info.solidsoft.pitest'
 
 buildscript {
     repositories {

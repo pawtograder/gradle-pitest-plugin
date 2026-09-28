@@ -18,7 +18,7 @@ group = "pitest.test.kotlin"
 
 apply(plugin = "java")
 apply(plugin ="org.jetbrains.kotlin.jvm")
-apply(plugin = "info.solidsoft.pitest")
+apply(plugin = "com.pawtograder.info.solidsoft.pitest")
 
 repositories {
     mavenCentral()

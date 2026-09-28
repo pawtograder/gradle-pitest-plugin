@@ -16,7 +16,7 @@ abstract class AbstractPitestFunctionalSpec extends IntegrationSpec {
     protected static String getBasicGradlePitestConfig() {
         return """
                 apply plugin: 'java'
-                apply plugin: 'info.solidsoft.pitest'
+                apply plugin: 'com.pawtograder.info.solidsoft.pitest'
                 group = 'gradle.pitest.test'
 
                 repositories {

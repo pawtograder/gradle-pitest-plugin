@@ -1,6 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'java-test-fixtures'
-apply plugin: 'info.solidsoft.pitest'
+apply plugin: 'com.pawtograder.info.solidsoft.pitest'
 
 buildscript {
     repositories {

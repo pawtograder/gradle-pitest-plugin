@@ -45,7 +45,7 @@ class BasicProjectBuilderSpec extends Specification {
         project = ProjectBuilder.builder().withProjectDir(tmpProjectDir.root).build()
 
         project.pluginManager.apply('java')   //to add SourceSets
-        project.pluginManager.apply('info.solidsoft.pitest')
+        project.pluginManager.apply('com.pawtograder.info.solidsoft.pitest')
 
         pitestConfig = project.getExtensions().getByType(PitestPluginExtension)
 

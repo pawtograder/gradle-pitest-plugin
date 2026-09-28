@@ -18,7 +18,7 @@ class OverridePluginFunctionalSpec extends AbstractPitestFunctionalSpec {
         given:
             buildFile << """
                 apply plugin: 'java'
-                apply plugin: 'info.solidsoft.pitest'
+                apply plugin: 'com.pawtograder.info.solidsoft.pitest'
                 apply plugin: 'nebula-override'
                 group = 'gradle.pitest.test'
 

@@ -10,7 +10,7 @@ class TargetClassesFunctionalSpec extends AbstractPitestFunctionalSpec {
         given:
             buildFile << """
                 apply plugin: 'java'
-                apply plugin: 'info.solidsoft.pitest'
+                apply plugin: 'com.pawtograder.info.solidsoft.pitest'
             """.stripIndent()
         and:
             writeHelloWorld('gradle.pitest.test.hello')

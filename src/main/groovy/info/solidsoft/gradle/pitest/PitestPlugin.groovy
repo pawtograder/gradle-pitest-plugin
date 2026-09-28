@@ -49,13 +49,14 @@ import static org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_
 @CompileStatic
 class PitestPlugin implements Plugin<Project> {
 
-    public static final String PLUGIN_ID = "info.solidsoft.pitest"
+    public static final String PLUGIN_ID = "com.pawtograder.info.solidsoft.pitest"
     public final static String PITEST_TASK_GROUP = VERIFICATION_GROUP
     public final static String PITEST_TASK_NAME = "pitest"
     public final static String PITEST_REPORT_DIRECTORY_NAME = 'pitest'
     public final static String PITEST_CONFIGURATION_NAME = 'pitest'
 
-    public final static String DEFAULT_PITEST_VERSION = '1.15.0'
+    //Generated from 'pitestVersion' in gradle.properties at build time - see build.gradle
+    public final static String DEFAULT_PITEST_VERSION = readDefaultPitestVersion()
     @Internal   //6.4 due to main -> mainClass change to avoid deprecation warning in Gradle 7.x - https://github.com/szpak/gradle-pitest-plugin/pull/289
     public static final GradleVersion MINIMAL_SUPPORTED_GRADLE_VERSION = GradleVersion.version("6.4") //public as used also in regression tests
 
@@ -73,6 +74,22 @@ class PitestPlugin implements Plugin<Project> {
 
     private Project project
     private PitestPluginExtension extension
+
+    private static String readDefaultPitestVersion() {
+        Class<?> pluginClass = PitestPlugin
+        InputStream defaultsStream = pluginClass.getResourceAsStream("pitest-defaults.properties")
+        if (defaultsStream == null) {
+            throw new IllegalStateException("'pitest-defaults.properties' not found in the plugin jar. " +
+                "It is generated from 'pitestVersion' in gradle.properties - see build.gradle")
+        }
+        Properties defaults = new Properties()
+        try {
+            defaults.load(defaultsStream)
+        } finally {
+            defaultsStream.close()
+        }
+        return defaults.getProperty("defaultPitestVersion")
+    }
 
     PitestPlugin() {
         this.gradleVersionEnforcer = GradleVersionEnforcer.defaultEnforcer(MINIMAL_SUPPORTED_GRADLE_VERSION)
@@ -226,7 +243,7 @@ class PitestPlugin implements Plugin<Project> {
     private void addPitDependencies(Configuration pitestConfiguration) {
         pitestConfiguration.withDependencies { dependencies ->
             log.info("Using PIT: ${extension.pitestVersion.get()}")
-            dependencies.add(project.dependencies.create("org.pitest:pitest-command-line:${extension.pitestVersion.get()}"))
+            dependencies.add(project.dependencies.create("com.pawtograder.org.pitest:pitest-command-line:${extension.pitestVersion.get()}"))
         }
 
         addPitJUnit5PluginIfRequested(pitestConfiguration)
