@@ -2,6 +2,13 @@
 
 ## Pawtograder fork
 
+### 1.0.1 - 2026-09-28
+
+ - PIT `2.0.1` by default. It works around JDK-8376185 on JDK 21: without it, every pre-baked mutant of a record after
+   the first in a minion failed with RUN_ERROR ("attempted to change the class NestHost, NestMembers, Record, or
+   PermittedSubclasses attribute") when a record component had a type annotation such as `@Nullable` -
+   [pawtograder/pitest#2](https://github.com/pawtograder/pitest/pull/2)
+
 ### 1.0.0 - 2026-09-01
 
  - PIT `2.0.0` (released, no longer a snapshot) by default - clients no longer need a snapshot repository

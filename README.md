@@ -20,7 +20,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.0'
+        classpath 'com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.1'
     }
 }
 
@@ -37,7 +37,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.0")
+        classpath("com.pawtograder.info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.0.1")
     }
 }
 
@@ -46,7 +46,7 @@ apply(plugin = "com.pawtograder.info.solidsoft.pitest")
 ```
 </details>
 
-Plugin 1.0.0 defaults to PIT 2.0.0, a released version - a snapshot repository is no longer needed. To use a different
+Plugin 1.0.1 defaults to PIT 2.0.1, a released version - a snapshot repository is no longer needed. To use a different
 PIT version, set `pitestVersion` in the `pitest` block; no new plugin release is required for that.
 
 Call Gradle with pitest task:
